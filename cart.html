@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cart</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: grey;
+			margin: 0;
+			padding: 0;
+		}
+
+		h1 {
+			text-align: center;
+			margin-top: 20px;
+		}
+
+		table {
+			margin: 20px auto;
+			border-collapse: collapse;
+			width: 80%;
+			max-width: 800px;
+			background-color: white;
+			box-shadow: 0 0 10px rgba(0,0,0,0.1);
+		}
+
+		th, td {
+			padding: 10px;
+			text-align: left;
+			border-bottom: 1px solid #ddd;
+		}
+
+		th {
+			background-color: #f2f2f2;
+		}
+
+		td:first-child {
+			width: 100px;
+		}
+
+		td img {
+			display: block;
+			max-width: 80px;
+			max-height: 80px;
+			margin: 0 auto;
+		}
+
+		#num-items {
+			font-weight: bold;
+		}
+
+		#cart-items tr:nth-child(even) {
+			background-color: #f2f2f2;
+		}
+
+		#cart-items td:last-child {
+			font-weight: bold;
+		}
+
+		#cart-items td:nth-child(3),
+		#cart-items td:last-child {
+			text-align: right;
+		}
+
+		#cart-items td:last-child {
+			padding-right: 20px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Cart</h1>
+	<div>
+		<p>Total Items:<span id="num-items"></span></p>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th>Image</th>
+				<th>Name</th>
+				<th>Price</th>
+				<th>Quantity</th>
+			</tr>
+		</thead>
+		<tbody id="cart-items">
+		</tbody>
+	</table>
+
+	<script>
+		var cart = JSON.parse(localStorage.getItem('cart'));
+		var cartItems = document.getElementById('cart-items');
+		var numItems = document.getElementById('num-items');
+
+		if (cart && cart.length) {
+			var cartMap = new Map(); // Use a map to keep track of items in cart
+			cart.forEach(function(item) {
+				if (cartMap.has(item.name)) {
+					// Update quantity of item already in cart
+					var existingItem = cartMap.get(item.name);
+					existingItem.quantity++;
+				} else {
+					// Add new item to cart map
+					item.quantity = 1;
+					cartMap.set(item.name, item);
+				}
+			});
+
+			// Display items in cart
+			for (let item of cartMap.values()) {
+				var tr = document.createElement('tr');
+				var tdImage = document.createElement('td');
+				var tdName = document.createElement('td');
+				var tdPrice = document.createElement('td');
+				var tdQuantity = document.createElement('td');
+
+				tdImage.innerHTML = '<img src="' + item.image + '">';
+				tdName.textContent = item.name;
+				tdPrice.textContent = item.price;
+				tdQuantity.textContent = item.quantity;
+
+				tr.appendChild(tdImage);
+				tr.appendChild(tdName);
+				tr.appendChild(tdPrice);
+				tr.appendChild(tdQuantity);
+
+			cartItems.appendChild(tr);
+		}
+
+		// Display total number of items in cart
+		var totalItems = 0;
+		var tcost= 0;
+		cartMap.forEach(function(item) {
+			totalItems += item.quantity;
+			tcost+=(item.price);
+		});
+            numItems.textContent +=totalItems ;
+			
+
+	} else {
+		// Display message if cart is empty
+		var tr = document.createElement('tr');
+		var tdEmpty = document.createElement('td');
+		tdEmpty.setAttribute('colspan', '4');
+		tdEmpty.textContent = 'Your cart is empty';
+
+		tr.appendChild(tdEmpty);
+		cartItems.appendChild(tr);
+	}
+</script>
+</body>
+</html>
